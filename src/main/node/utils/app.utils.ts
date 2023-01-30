@@ -23,6 +23,10 @@ export const getCommand = (cmd?: string): Command<any> | undefined => {
     return undefined;
 };
 
+export const getCommandName = (command: Command<BaseFlag>): string | undefined => {
+    return Object.keys(commands).find(key => commands[key as keyof typeof commands] === command)
+}
+
 export const parseFlag = <T extends BaseFlag, D extends BaseFlag_<T> = BaseFlag_<T>>(cli: MeowConfig.Cli, flagDesc: D): T => {
     const parsed: T = {} as T;
     const { flags } = cli;
