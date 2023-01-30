@@ -52,7 +52,11 @@ export class DefaultTimesheetService implements TimesheetService {
             throw new Error("stop existing time entry, before starting new one.");
         }
         const cwd = process.cwd();
-        const cache = !flag.noCache && this.config.paths ? this.config.paths[cwd] : undefined;
+        let cache = !flag.noCache && this.config.paths ? this.config.paths[cwd] : undefined;
+        if(flag.replace) {
+            cache = undefined;
+            flag.noCache = false;
+        }
         const project = cache ? cache.project : `${(await this.chooseProject()).id}`;
         const activity = cache ? cache.activity : `${(await this.chooseActivity(parseInt(project!))).id}`;
         const timezone = await this.getTimezone(!flag.noCache);
