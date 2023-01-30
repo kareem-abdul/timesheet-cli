@@ -10,4 +10,5 @@ export const config = (command: Command<any>) => meow(commands.help.generateHelp
     description: false,
     flags: command.flags,
     argv: process.argv.slice(3),
+    allowUnknownFlags: false,
 });
