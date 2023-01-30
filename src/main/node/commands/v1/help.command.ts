@@ -38,6 +38,14 @@ export class HelpCommand implements Command<BaseFlag> {
         cli.showHelp();
     }
 
+    public showHelp(command: Command<BaseFlag>) {
+        const commandName = AppUtils.getCommandName(command);
+        if (!commandName) {
+            throw new Error(`${command} is not registered command`);
+        }
+        log.print(this.generateCommandHelp(commandName, command));
+    }
+
     public generateCommandHelp(commandName: string, command: Command<any>): string {
         let name = commandName;
         let help = '\n  ';
