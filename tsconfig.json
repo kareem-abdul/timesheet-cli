@@ -1,0 +1,44 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "es2015",
+    "module": "commonjs",
+    "declaration": false,
+    "moduleResolution": "node",
+    "esModuleInterop": true,
+    "removeComments": true,
+    "sourceMap": false,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "allowSyntheticDefaultImports": true,
+    
+    "newLine": "lf",
+    "rootDir": "./src",
+    "outDir": "./dist/build",
+    "baseUrl": "./src",
+    "paths": {
+      "@constants": ["main/node/constants"],
+      "@utils": ["main/node/utils/index"],
+      "@utils/*": ["main/node/utils/*"],
+      "@flags/*": ["main/node/flags/*"],
+      "@services": ["main/node/services/index"],
+      "@services/*": ["main/node/services/*"],
+      "@commands": ["main/node/commands/index"],
+      "@commands/*": ["main/node/commands/*"],
+      "@config": ["main/node/config/index"],
+      "@config/*": ["main/node/config/*"],
+      "@properties": ["main/resources/app.properties"],
+      "@resources/*": ["main/resources/*"],
+      "@app/*": ["main/node/*"],
+      "@lib/*": ["lib/*"]
+    },
+    "incremental": true,
+    "skipLibCheck": true,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "strictBindCallApply": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": false
+  }
+}
+
