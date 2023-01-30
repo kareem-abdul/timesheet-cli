@@ -8,7 +8,7 @@ import {
 import { constants } from '@constants';
 import { BaseFlag } from '@flags/base.flag';
 import { properties } from '@properties';
-import { AppUtils } from '@utils';
+import { AppUtils, ObjectUtils } from '@utils';
 
 export class HelpCommand implements Command<BaseFlag> {
     private static readonly spacer: string = '\n\n';
@@ -25,6 +25,7 @@ export class HelpCommand implements Command<BaseFlag> {
         readonly desc: string = constants.HELP_COMMAND_DESC,
         readonly usage: string = `${chalk.cyan('help')} ${chalk.cyan('[commands]')}`,
         readonly flags = {},
+        readonly allowInput = true,
     ) { }
 
     async run(cli: MeowConfig.Cli) {
@@ -53,7 +54,7 @@ export class HelpCommand implements Command<BaseFlag> {
         help += `  ${HelpCommand.greenInverse(' USAGE ')} ${HelpCommand.spacer}`;
         help += `   ${chalk.gray('$')} ${chalk.green(properties.app.name)} `;
         name = chalk.cyan(name);
-        help += command.usage || (command.flags ? `${name} ${chalk.yellow('[options]')}` : `${name}`);
+        help += command.usage || (!ObjectUtils.isEmpty(command.flags) ? `${name} ${chalk.yellow('[options]')}` : `${name}`);
         help += HelpCommand.spacer;
         if (command.flags && Object.keys(command.flags).length !== 0) {
             help += `  ${HelpCommand.yellowInverse(' OPTIONS ')}${HelpCommand.spacer}`;

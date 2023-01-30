@@ -44,6 +44,10 @@ export const isProxy = (object: any) => {
     return Object.getOwnPropertyDescriptor(object, proxy)?.value as boolean;
 };
 
+export const isEmpty = (object: any) => {
+    return Object.keys(object).length === 0;
+};
+
 interface Handler<T extends object> extends ProxyHandler<T> {
     instance: undefined | T;
 }
