@@ -6,5 +6,6 @@ export interface Command<T extends BaseFlag> {
     readonly usage?: string;
     readonly alias?: string;
     readonly flags: BaseFlag_<T>;
+    readonly allowInput?: boolean;
     run(cli: MeowConfig.Cli): Promise<void | any>;
 }

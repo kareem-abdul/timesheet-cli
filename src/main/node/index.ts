@@ -7,9 +7,9 @@ require('any-observable/register')('global.Observable');
 
 import { handleUnhandledErrors } from '@app/middleware/error-handler';
 handleUnhandledErrors();
-
-import { MeowConfig } from '@config';
+import { log, MeowConfig } from '@config';
 import { AppUtils } from '@utils';
+import { commands } from '@commands';
 
 (async () => {
     const args = process.argv;
@@ -17,6 +17,11 @@ import { AppUtils } from '@utils';
 
     if (command) {
         const cli = MeowConfig.config(command);
+        if(!command.allowInput && cli.input && cli.input.length > 0) {
+            log.error(`invalid ${args[2]} command`);
+            commands.help.showHelp(command);
+            process.exit(0);
+        }
         await command.run(cli);
         process.exit(0);
     }
