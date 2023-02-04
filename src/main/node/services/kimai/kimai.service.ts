@@ -1,4 +1,4 @@
-import { ActivityCollection, ProjectCollection, ProjectEntity, TimesheetApiApiTimesheetsGetRequest, TimesheetEditForm, TimesheetEntity, TimesheetEntityExpanded, UserEntity } from '@lib/kimai';
+import { ActivityCollection, ProjectCollection, ProjectEntity, TimesheetApiApiTimesheetsGetRequest, TimesheetCollectionExpanded, TimesheetEditForm, TimesheetEntity, TimesheetEntityExpanded, UserEntity } from '@lib/kimai';
 
 export interface KimaiService {
     getProjects(): Promise<ProjectCollection[]>;
@@ -13,7 +13,7 @@ export interface KimaiService {
     stopTimesheet(id: number): Promise<TimesheetEntity>;
 
 
-    getActive(): Promise<TimesheetEntity>;
+    getActive(): Promise<TimesheetCollectionExpanded[]>;
     
 
     getLoggedInUser(): Promise<UserEntity>;

@@ -12,15 +12,14 @@ export class SyncCommand implements Command<BaseFlag> {
 
     async run(cli: Cli): Promise<any> {
         const active = await kimaiService.getActive();
-        if (active) {
+        if (active && active.length > 0) {
             const config = configService.getConfig();
-            if (config.active !== `${active.id}`) {
-                configService.setConfig({ active: `${active.id}` })
+            if (config.active !== `${active[0].id}`) {
+                configService.setConfig({ active: `${active[0].id}` })
             }
         } else {
             configService.setConfig({ active: undefined });
         }
-
         const user = await kimaiService.getLoggedInUser();
         configService.setConfig({ timezone: user.timezone });
     }

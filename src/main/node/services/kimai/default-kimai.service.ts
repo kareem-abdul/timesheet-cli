@@ -1,4 +1,4 @@
-import { ProjectCollection, ActivityCollection, TimesheetApi, ActivityApi, ProjectApi, DefaultApi, UserApi, Configuration, ProjectEntity, UserEntity, TimesheetEditForm, TimesheetEntity, TimesheetApiApiTimesheetsGetRequest, TimesheetEntityExpanded } from '@lib/kimai';
+import { ProjectCollection, ActivityCollection, TimesheetApi, ActivityApi, ProjectApi, DefaultApi, UserApi, Configuration, ProjectEntity, UserEntity, TimesheetEditForm, TimesheetEntity, TimesheetApiApiTimesheetsGetRequest, TimesheetEntityExpanded, TimesheetCollectionExpanded } from '@lib/kimai';
 import { configService } from '@services';
 import { KimaiService } from '@services/kimai/kimai.service';
 import { AppUtils, ObjectUtils } from '@utils';
@@ -51,8 +51,8 @@ export class DefaultKimaiService implements KimaiService {
         return AppUtils.run("stoping time entry", () => this.timesheetApi.apiTimesheetsIdStopPatch({ id }).then(data => data.data));
     }
 
-    getActive(): Promise<TimesheetEntity> {
-        return AppUtils.run('fetching active time entry', () => this.timesheetApi.apiTimesheetsIdGet({ id: parseInt(configService.getConfig().active!) }).then(data => data.data));
+    async getActive(): Promise<TimesheetCollectionExpanded[]> {
+        return AppUtils.run('fetching active time entries', () => this.timesheetApi.apiTimesheetsActiveGet().then(data => data.data));
     }
 
     async ping() {
