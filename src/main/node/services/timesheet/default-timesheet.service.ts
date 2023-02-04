@@ -57,10 +57,11 @@ export class DefaultTimesheetService implements TimesheetService {
         const project = await this.getProject(!flag.noCache);
         const activity = await this.getAcitivity(project.id!, !flag.noCache);
         const timezone = await this.getTimezone(!flag.noCache);
+        const begin = await this.getDates(flag.date, timezone!);
         const entry = (await AppUtils.run("starting time entry", async () => {
             return this.timesheetApi.apiTimesheetsPost({
                 body: {
-                    begin: DateTime.now().setZone(timezone).toISO(),
+                    begin,
                     activity: activity.id!,
                     project: project.id!,
                     billable: !flag.notBillable,
@@ -99,6 +100,7 @@ export class DefaultTimesheetService implements TimesheetService {
         const project = (await this.chooseProject());
         const activity = (await this.chooseActivity(project!.id!));
         const activeEntry = await this.getActiveEntry();
+        const begin = await this.getDates(flag.date, (await this.getTimezone(!flag.noCache))!)
         if (!activeEntry) {
             throw new Error("no active time entry found");
         }
@@ -108,7 +110,7 @@ export class DefaultTimesheetService implements TimesheetService {
             () => this.timesheetApi.apiTimesheetsIdPatch({
                 id: parseInt(id),
                 body: {
-                    begin: activeEntry.begin,
+                    begin,
                     activity: activity.id as number,
                     project: project.id as number,
                     billable: !flag.notBillable,
@@ -117,18 +119,14 @@ export class DefaultTimesheetService implements TimesheetService {
             })
         )).data
 
-        if (!flag.noCache) {
-            this.setConfig({
-                active: `${entry.id}`,
-                paths: {
-                    ...this.config.paths,
-                    [process.cwd()]: {
-                        project: `${entry.project}`,
-                        activity: `${entry.activity}`
-                    }
-                }
-            });
+        const config = {
+            active: `${entry.id}`,
+            paths: this.config.paths ?? {}
+        };
+        if(!flag.noCache) {
+            config.paths[process.cwd()] = { project: `${project.id}`, activity: `${activity.id}`}
         }
+        this.setConfig(config);
         return this.map(entry, project, activity);
     }
 
@@ -360,5 +358,18 @@ export class DefaultTimesheetService implements TimesheetService {
     private setConfig(config: Partial<TimeSheetConfig>) {
         Object.assign(this.config, config);
         writeFileSync(this.configPath, JSON.stringify(this.config, null, ' '))
+    }
+
+    private async getDates(prompt: boolean, timezone: string) {
+        if(prompt) {
+            const { begin } = await inquirer.prompt({
+                type: 'date',
+                name: 'begin',
+                message: 'enter starting time',
+                default: new Date()
+            });
+            return DateTime.fromJSDate(begin, { zone: timezone}).toISO();
+        }
+        return DateTime.now().setZone(timezone).toISO();
     }
 }
