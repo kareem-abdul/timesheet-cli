@@ -1,6 +1,7 @@
 import { TimeEntry } from '@app/dto/time-entry';
 import { ListFlag } from '@flags/list.flag';
 import { StartFlag } from '@flags/start.flag';
+import { UpdateFlag } from '@flags/update.flag';
 import { ActivityCollection, ProjectCollection, TimesheetEntity, TimesheetEntityExpanded } from '@lib/kimai';
 import { configService, kimaiService } from '@services';
 import { TimesheetService } from '@services/timesheet/timesheet.service';
@@ -47,7 +48,7 @@ export class DefaultTimesheetService implements TimesheetService {
         return this.map(entry);
     }
 
-    async update(flag: StartFlag, id: string | undefined = configService.getConfig().active): Promise<TimeEntry> {
+    async update(flag: UpdateFlag, id: string | undefined = configService.getConfig().active): Promise<TimeEntry> {
         if (!id) {
             throw new Error("no active time entry found");
         }
