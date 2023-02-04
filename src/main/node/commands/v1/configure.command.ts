@@ -3,7 +3,7 @@ import { log } from '@config';
 import { Cli } from '@config/meow.config';
 import { constants } from '@constants';
 import { ConfigFlag, ConfigFlag_ } from '@flags/config.flag';
-import { timesheetService } from '@services';
+import { configService, timesheetService } from '@services';
 import { AppUtils } from '@utils';
 
 export class ConfigureCommand implements Command<ConfigFlag> {
@@ -16,7 +16,7 @@ export class ConfigureCommand implements Command<ConfigFlag> {
 
     async run(cli: Cli): Promise<any> {
         const flag = AppUtils.parseFlag<ConfigFlag>(cli, this.flags);
-        const config = await timesheetService.configure(flag);
+        const config = await configService.configure(flag);
         log.print(`${constants.DONE} configured. see ${config.path}.`)
     }
 }

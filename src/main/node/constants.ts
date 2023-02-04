@@ -7,6 +7,7 @@ export const constants = {
     UPDATE_COMMAND_DESC: 'Update the active time entry',
     CONFIGURE_COMMAND_DESC: 'Configure the app',
     LIST_COMMAND_DESC: 'Lists previous time entries',
+    SYNC_COMMAND_DESCRIPTION: 'Syncs local cache with remote',
     
     HOUR_FORMAT: 'hh:mm',
 
