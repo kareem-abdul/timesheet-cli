@@ -51,38 +51,31 @@ export class DefaultTimesheetService implements TimesheetService {
         if (this.config.active) {
             throw new Error("stop existing time entry, before starting new one.");
         }
-        const cwd = process.cwd();
-        let cache = !flag.noCache && this.config.paths ? this.config.paths[cwd] : undefined;
         if(flag.replace) {
-            cache = undefined;
-            flag.noCache = false;
+            flag.noCache = true;
         }
-        const project = cache ? cache.project : `${(await this.chooseProject()).id}`;
-        const activity = cache ? cache.activity : `${(await this.chooseActivity(parseInt(project!))).id}`;
+        const project = await this.getProject(!flag.noCache);
+        const activity = await this.getAcitivity(project.id!, !flag.noCache);
         const timezone = await this.getTimezone(!flag.noCache);
         const entry = (await AppUtils.run("starting time entry", async () => {
             return this.timesheetApi.apiTimesheetsPost({
                 body: {
                     begin: DateTime.now().setZone(timezone).toISO(),
-                    activity: parseInt(activity!),
-                    project: parseInt(project!),
+                    activity: activity.id!,
+                    project: project.id!,
                     billable: !flag.notBillable,
                     description: flag.description
                 },
             })
         })).data;
-        if (!flag.noCache) {
-            this.setConfig({
-                active: `${entry.id}`,
-                paths: {
-                    ...this.config.paths,
-                    [process.cwd()]: {
-                        project: `${entry.project}`,
-                        activity: `${entry.activity}`
-                    }
-                }
-            });
+        const config = {
+            active: `${entry.id}`,
+            paths: this.config.paths ?? {}
+        };
+        if(!flag.noCache) {
+            config.paths[process.cwd()] = { project: `${project.id}`, activity: `${activity.id}`}
         }
+        this.setConfig(config);
         return this.map(entry);
     }
 
@@ -193,7 +186,7 @@ export class DefaultTimesheetService implements TimesheetService {
                 message: 'enter base url?',
                 when: !this.config.baseUrl,
                 default: properties.kimai.baseUrl,
-                transformer: (input: string, answers, flags) => input.endsWith('/') ? input.substring(0, input.lastIndexOf('/')) : input,
+                transformer: (input: string) => input.endsWith('/') ? input.substring(0, input.lastIndexOf('/')) : input,
             },
             {
                 type: 'input',
@@ -201,7 +194,7 @@ export class DefaultTimesheetService implements TimesheetService {
                 message: 'enter your email address.',
                 when: !this.config?.user,
                 default: this.config?.user,
-                validate: (input) => !validator.isEmpty(input) && validator.isEmail(input)
+                validate: (input) =>  !validator.isEmpty(input) && validator.isEmail(input) || 'enter valid email'
             },
             {
                 type: 'password',
@@ -253,6 +246,14 @@ export class DefaultTimesheetService implements TimesheetService {
         );
     }
 
+    private async getAcitivity(projectId: number, cache: boolean) {
+        const cwd = process.cwd();
+        const id = cache && !!this.config.paths ? this.config.paths[cwd].activity : undefined;
+        return !!id
+        ? AppUtils.run('fetching activity', () => this.activityApi.apiActivitiesIdGet({ id: parseInt(id!) }).then(res => res.data)) 
+        : this.chooseActivity(projectId);
+    }
+
     private async getActivities(...projects: number[]) {
         return AppUtils.run<ActivityCollection[]>(
             'fetching activities',
@@ -267,6 +268,14 @@ export class DefaultTimesheetService implements TimesheetService {
             'fetching projects',
             () => this.projectApi.apiProjectsGet().then(data => data.data)
         );
+    }
+
+    private async getProject(cache: boolean) {
+        const cwd = process.cwd();
+        const id = cache && !!this.config.paths ? this.config.paths[cwd].project : undefined;
+        return !!id 
+        ?  AppUtils.run('fethcing project', () => this.projectApi.apiProjectsIdGet({ id }).then(res => res.data))
+        : this.chooseProject(); 
     }
 
     private async chooseProject(): Promise<ProjectCollection> {
