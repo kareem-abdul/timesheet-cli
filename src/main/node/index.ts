@@ -11,6 +11,12 @@ import { log, MeowConfig } from '@config';
 import { AppUtils } from '@utils';
 import { commands } from '@commands';
 
+import inquirer, { prompts } from 'inquirer';
+import DatePrompt from "inquirer-date-prompt";
+
+inquirer.registerPrompt('date', DatePrompt as prompts.PromptConstructor);
+
+
 (async () => {
     const args = process.argv;
     const command = args.length >= 3 ? AppUtils.getCommand(args[2]) : undefined;
